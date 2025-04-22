@@ -14,12 +14,12 @@
 #define TIME 12500
 
 typedef enum {
-	ON25=0,
-	OFF25,
-	ON40,
-	OFF40,
-	ON110,
-	OFF110,
+	ON35=0,
+	OFF35,
+	ON23,
+	OFF49,
+	ON72,
+	OFF19,
 
 } enEstados;
 
@@ -52,46 +52,45 @@ void arranqueGPIOS (void)
 int main(void)
 {
 	arranqueGPIOS();
-	enEstados EstadoActual= ON25;
+	enEstados EstadoActual= ON35;
 
 	while (1)
 	{
 		switch (EstadoActual)
 		{
-		case ON25:
+		case ON35:
 			GPIO_SetBits(GPIOA,GPIO_Pin_5);
-			EstadoActual=OFF25;
-			delay_ms(25);
+			EstadoActual=OFF35;
+			delay_ms(35);
 			break;
-		case OFF25:
+		case OFF35:
 			GPIO_ResetBits(GPIOA,GPIO_Pin_5);
-			EstadoActual=ON40;
-			delay_ms(25);
+			EstadoActual=ON23;
+			delay_ms(35);
 			break;
-		case ON40:
+		case ON23:
 			GPIO_SetBits(GPIOA,GPIO_Pin_5);
-			EstadoActual=OFF40;
-			delay_ms(40);
+			EstadoActual=OFF49;
+			delay_ms(23);
 			break;
-		case OFF40:
+		case OFF49:
 			GPIO_ResetBits(GPIOA,GPIO_Pin_5);
- 			EstadoActual=ON110;
- 			delay_ms(40);
+ 			EstadoActual=ON72;
+ 			delay_ms(49);
  			break;
-		case ON110:
+		case ON72:
 			GPIO_SetBits(GPIOA,GPIO_Pin_5);
-			EstadoActual=OFF110;
-			delay_ms(110);
+			EstadoActual=OFF19;
+			delay_ms(72);
 			break;
-		case OFF110:
+		case OFF19:
 			GPIO_ResetBits(GPIOA,GPIO_Pin_5);
-			EstadoActual=ON25;
-		    delay_ms(110);
+			EstadoActual=ON35;
+		    delay_ms(19);
 			break;
 
 		}
 
 	}
-
 
 }
