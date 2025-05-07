@@ -11,7 +11,7 @@
 #include "stm32f4xx.h"
 #include "stm32f4xx_gpio.h"
 
-#define TIME 12500
+#define TIME 12700
 
 typedef enum {
 	ON35=0,
@@ -37,15 +37,15 @@ void delay_ms (uint32_t ms)
 
 void arranqueGPIOS (void)
 {
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 
 	GPIO_InitTypeDef GPIO_InitStruct;
-	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_5;
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_10;
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_Init(GPIOA, &GPIO_InitStruct);
+	GPIO_Init(GPIOD, &GPIO_InitStruct);
 
 }
 
@@ -59,32 +59,32 @@ int main(void)
 		switch (EstadoActual)
 		{
 		case ON35:
-			GPIO_SetBits(GPIOA,GPIO_Pin_5);
+			GPIO_SetBits(GPIOD,GPIO_Pin_10);
 			EstadoActual=OFF35;
 			delay_ms(35);
 			break;
 		case OFF35:
-			GPIO_ResetBits(GPIOA,GPIO_Pin_5);
+			GPIO_ResetBits(GPIOD,GPIO_Pin_10);
 			EstadoActual=ON23;
 			delay_ms(35);
 			break;
 		case ON23:
-			GPIO_SetBits(GPIOA,GPIO_Pin_5);
+			GPIO_SetBits(GPIOD,GPIO_Pin_10);
 			EstadoActual=OFF49;
 			delay_ms(23);
 			break;
 		case OFF49:
-			GPIO_ResetBits(GPIOA,GPIO_Pin_5);
+			GPIO_ResetBits(GPIOD,GPIO_Pin_10);
  			EstadoActual=ON72;
  			delay_ms(49);
  			break;
 		case ON72:
-			GPIO_SetBits(GPIOA,GPIO_Pin_5);
+			GPIO_SetBits(GPIOD,GPIO_Pin_10);
 			EstadoActual=OFF19;
 			delay_ms(72);
 			break;
 		case OFF19:
-			GPIO_ResetBits(GPIOA,GPIO_Pin_5);
+			GPIO_ResetBits(GPIOD,GPIO_Pin_10);
 			EstadoActual=ON35;
 		    delay_ms(19);
 			break;
@@ -94,3 +94,4 @@ int main(void)
 	}
 
 }
+
