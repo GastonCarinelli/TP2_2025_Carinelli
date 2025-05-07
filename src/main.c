@@ -11,87 +11,74 @@
 #include "stm32f4xx.h"
 #include "stm32f4xx_gpio.h"
 
-#define TIME 12700
-
 typedef enum {
-	ON35=0,
-	OFF35,
-	ON23,
-	OFF49,
-	ON72,
-	OFF19,
+    LEDOFF = 0,
+    LEDON = 1,
+} EstadoLED;
 
-} enEstados;
+void GPIOS(void);
+void delay(uint32_t t);
 
-void delay_ms (uint32_t ms)
-{
-	uint32_t i;
-	while (ms)
-	{
-		//El for de 1ms
-		for (i=0;i<TIME;i++);
-		ms--;
-	}
+int main(void) {
+    GPIOS();
 
+    EstadoLED EstadoLedActual = LEDOFF;
+    uint8_t EstadoBoton = 0;
+    uint8_t prevEstadoBoton = 0;
+
+    while (1) {
+        EstadoBoton = GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_13);
+
+        switch (EstadoLedActual) {
+            case LEDOFF:
+                if (EstadoBoton != prevEstadoBoton && EstadoBoton == Bit_SET) {
+                    EstadoLedActual = LEDON;
+                }
+                break;
+            case LEDON:
+                if (EstadoBoton != prevEstadoBoton && EstadoBoton == Bit_RESET) {
+                    EstadoLedActual = LEDOFF;
+                }
+                break;
+        }
+
+        switch (EstadoLedActual) {
+            case LEDOFF:
+                GPIO_SetBits(GPIOD, GPIO_Pin_10); // Enciende el LED
+                break;
+            case LEDON:
+                GPIO_ResetBits(GPIOD, GPIO_Pin_10); // Apaga el LED
+                break;
+        }
+
+        prevEstadoBoton = EstadoBoton;
+
+        delay(100000);
+    }
 }
 
-void arranqueGPIOS (void)
-{
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+void GPIOS(void) {
+    GPIO_InitTypeDef GPIO_InitStruct;
 
-	GPIO_InitTypeDef GPIO_InitStruct;
-	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_10;
-	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_Init(GPIOD, &GPIO_InitStruct);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE | RCC_AHB1Periph_GPIOD, ENABLE);
 
+    // Configura PE13 como entrada del botón
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_13;
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+    GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+    // Configura PD10 como salida del LED
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_10;
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOD, &GPIO_InitStruct);
 }
 
-int main(void)
-{
-	arranqueGPIOS();
-	enEstados EstadoActual= ON35;
-
-	while (1)
-	{
-		switch (EstadoActual)
-		{
-		case ON35:
-			GPIO_SetBits(GPIOD,GPIO_Pin_10);
-			EstadoActual=OFF35;
-			delay_ms(35);
-			break;
-		case OFF35:
-			GPIO_ResetBits(GPIOD,GPIO_Pin_10);
-			EstadoActual=ON23;
-			delay_ms(35);
-			break;
-		case ON23:
-			GPIO_SetBits(GPIOD,GPIO_Pin_10);
-			EstadoActual=OFF49;
-			delay_ms(23);
-			break;
-		case OFF49:
-			GPIO_ResetBits(GPIOD,GPIO_Pin_10);
- 			EstadoActual=ON72;
- 			delay_ms(49);
- 			break;
-		case ON72:
-			GPIO_SetBits(GPIOD,GPIO_Pin_10);
-			EstadoActual=OFF19;
-			delay_ms(72);
-			break;
-		case OFF19:
-			GPIO_ResetBits(GPIOD,GPIO_Pin_10);
-			EstadoActual=ON35;
-		    delay_ms(19);
-			break;
-
-		}
-
-	}
-
+void delay(uint32_t t) {
+    while (t--);
 }
-
